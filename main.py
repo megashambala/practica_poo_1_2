@@ -1,11 +1,12 @@
 from src.prueba import *
-class Main:
-    def __init__(self):
-        self.message_personalized
-    def main(self,message_personalized,conexion):
-        self.connect_mqtt()
-        self.message_personalized = input()
+def main():
+    while(True):
+        message_personalized = input()
+        if isinstance(message_personalized,(str)):
+            message_personalized.send_message()
+        else:
+            if message_personalized==0:
+                break
 if __name__ == "__main__":
     test=MQTT_Meshtastic()
-    test.main()
-    
+    main()
