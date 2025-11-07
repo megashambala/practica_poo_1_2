@@ -9,4 +9,4 @@ def main():
                 break
 if __name__ == "__main__":
     test=MQTT_Meshtastic()
-    main()
+    test=main()
