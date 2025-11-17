@@ -13,6 +13,9 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import base64
 import re
+import logging
+import os
+import pathlib
 class MQTT_Meshtastic:
     def __init__(self):
 #### Debug Options
@@ -22,6 +25,8 @@ class MQTT_Meshtastic:
         self.print_service_envelope = False
         self.print_message_packet = False
 
+
+        self.brodcast = BROADCAST_NUM
         self.print_node_info =  True
         self.print_node_position = True
         self.print_node_telemetry = True
@@ -34,7 +39,7 @@ class MQTT_Meshtastic:
         self.root_topic = "msh/EU_868/ES/2/e/"
         self.channel = "TestMQTT"
         self.key = "ymACgCy9Tdb8jHbLxUxZ/4ADX+BWLOGVihmKHcHTVyo="
-        self.message_text = "Hola soy Ekaitz"
+        self.message_text = "Ordenador de Ekaitz"
 
         # Generate 4 random hexadecimal characters to create a unique node name
         self.node_name = "!abcdc0c8"
@@ -48,7 +53,7 @@ class MQTT_Meshtastic:
         self.client_hw_model = 255
 
         self.tls_configured = False
-
+        self.filename = "C:\Users\EKAITZ\OneDrive - Universidad de Burgos\AAA Sgundo Curso\POO_PRactica_1_2\Log\log.txt"
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="", clean_session=True, userdata=None)
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
@@ -327,4 +332,30 @@ class MQTT_Meshtastic:
                 time.sleep(self.auto_reconnect_delay)
                 self.connect_mqtt()
 
-    
+# Funcion que he creado yo para guardar cosas en json
+    def process_file(self,filename):
+        try:
+            if not os.path.isfile(filename):
+                raise FileNotFoundError(f"El archivo {filename} no existe.")
+            
+            with open(filename,'r') as file:
+                data = file.readlines()
+            
+            if not data:
+                raise ValueError("El archivo está vacio.")
+            
+            processed_data = []
+            for line in data:
+                try:
+                    self.message_text = str(line.strip())
+                except ValueError:
+                    print(f"Advertencia: {line.strip()} no es una mensaje válido y se omitirá.")
+            if not processed_data:
+                raise RuntimeError("No se pudieron procesar datos válidos del archivo.")
+            
+            print("Datos procesados con exito:",processed_data)
+            return processed_data
+        except (FileNotFoundError,ValueError,RuntimeError) as e:
+            print(f"Error:{e}")
+        except Exception as e:
+            print(f"Se produjo un error inesperado :{e}")
